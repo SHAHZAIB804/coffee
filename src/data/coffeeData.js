@@ -7,7 +7,7 @@ const coffeeData = [
   },
   {
     id: 2,
-    name: "Cappuccino 1",
+    name: "Cappuccino",
     price: 4.0,
     image: "/src/assets/coffee1.jpeg"
   },
