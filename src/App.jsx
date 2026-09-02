@@ -26,6 +26,12 @@ import AdminLogin from "./pages/admin/AdminLogin.jsx";
 import AdminLayout from "./components/admin/AdminLayout.jsx";
 import AdminDashboardOverview from "./pages/admin/AdminDashboardOverview.jsx";
 import AdminOrders from "./pages/admin/AdminOrders.jsx";
+import AdminProducts from "./pages/admin/AdminProducts.jsx";
+import AdminCategories from "./pages/admin/AdminCategories.jsx";
+import AdminSections from "./pages/admin/AdminSections.jsx";
+import AdminHomepage from "./pages/admin/AdminHomepage.jsx";
+import AdminOffers from "./pages/admin/AdminOffers.jsx";
+import AdminCustomers from "./pages/admin/AdminCustomers.jsx";
 
 export default function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(() => {
@@ -55,8 +61,14 @@ export default function App() {
         <Route index element={<Navigate to="/admin/dashboard" replace />} />
         <Route path="dashboard" element={<AdminDashboardOverview />} />
         <Route path="orders" element={<AdminOrders />} />
-        {/* Placeholder for future admin routes */}
-        <Route path="*" element={<div className="p-8 text-gray-500">Feature coming soon.</div>} />
+        <Route path="products" element={<AdminProducts />} />
+        <Route path="categories" element={<AdminCategories />} />
+        <Route path="sections" element={<AdminSections />} />
+        <Route path="homepage" element={<AdminHomepage />} />
+        <Route path="offers" element={<AdminOffers />} />
+        <Route path="customers" element={<AdminCustomers />} />
+        {/* Fallback for unknown admin routes */}
+        <Route path="*" element={<Navigate to="/admin/dashboard" replace />} />
       </Route>
 
       {/* Customer Routes */}

@@ -2,13 +2,22 @@ import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { FiArrowRight, FiPlay } from "react-icons/fi";
 
-export default function Hero() {
+export default function Hero({ data = {} }) {
+  const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
+  const heading = data.heading || "Crafted for coffee lovers.";
+  const subheading = data.subheading || "Freshly roasted every morning";
+  const description = data.description || "Experience boutique coffee blends, slow-roasted beans, and handcrafted drinks made to elevate every moment.";
+  const buttonText = data.buttonText || "Explore Menu";
+  const buttonLink = data.buttonLink || "/menu";
+  const imageUrl = data.imageUrl ? `${apiUrl}${data.imageUrl}` : "https://images.unsplash.com/photo-1498804103079-a4f3fe7a4f0e?auto=format&fit=crop&w=1800&q=80";
+
   return (
     <section className="relative flex min-h-[720px] items-center overflow-hidden bg-[#1d120d]">
       <div className="absolute inset-0">
         <img
-          src="https://images.unsplash.com/photo-1498804103079-a4f3fe7a4f0e?auto=format&fit=crop&w=1800&q=80"
-          alt="Coffee beans and cup"
+          src={imageUrl}
+          alt="Hero background"
           className="h-full w-full object-cover opacity-70"
         />
         <div className="absolute inset-0 bg-gradient-to-r from-[#1d120d]/90 via-[#1d120d]/70 to-[#1d120d]/40" />
@@ -23,29 +32,25 @@ export default function Hero() {
         >
           <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-sm font-medium text-[#f7efe8] backdrop-blur-sm">
             <span className="h-2 w-2 rounded-full bg-[#d9a668]" />
-            Freshly roasted every morning
+            {subheading}
           </div>
 
           <h1 className="text-5xl font-black tracking-tight text-white sm:text-6xl lg:text-7xl">
-            Crafted for <span className="text-[#d9a668]">coffee lovers</span>.
+            {heading}
           </h1>
 
           <p className="mt-6 max-w-xl text-lg leading-8 text-[#eaded4]">
-            Experience boutique coffee blends, slow-roasted beans, and handcrafted drinks made to elevate every moment.
+            {description}
           </p>
 
           <div className="mt-9 flex flex-wrap items-center gap-4">
             <Link
-              to="/menu"
+              to={buttonLink}
               className="inline-flex items-center gap-2 rounded-full bg-[#d9a668] px-7 py-3.5 text-base font-semibold text-[#1d120d] transition hover:bg-[#e4b677]"
             >
-              Explore Menu
+              {buttonText}
               <FiArrowRight />
             </Link>
-            <button className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/5 px-6 py-3.5 text-base font-semibold text-white backdrop-blur-sm transition hover:bg-white/10">
-              <FiPlay />
-              Watch Story
-            </button>
           </div>
 
           <div className="mt-10 flex flex-wrap gap-8 text-sm text-[#eaded4]">

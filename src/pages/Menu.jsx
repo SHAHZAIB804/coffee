@@ -1,32 +1,73 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { FiSearch, FiStar } from "react-icons/fi";
+import { io } from "socket.io-client";
 import CoffeeCard from "../components/CoffeeCard";
-import coffeeData from "../data/coffeeData";
-
-const categories = ["All", "Signature", "Classic", "Espresso", "Specialty", "Cold Brew", "Seasonal"];
 
 export default function Menu() {
+  const [products, setProducts] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [search, setSearch] = useState("");
   const [sortBy, setSortBy] = useState("popular");
+  
+  const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
+  useEffect(() => {
+    fetchProducts();
+    fetchCategories();
+
+    const socket = io(apiUrl);
+    socket.on('product:created', () => fetchProducts());
+    socket.on('product:updated', () => fetchProducts());
+    socket.on('product:deleted', () => fetchProducts());
+    socket.on('category:created', () => fetchCategories());
+    socket.on('category:updated', () => fetchCategories());
+    socket.on('category:deleted', () => fetchCategories());
+
+    return () => socket.disconnect();
+  }, [apiUrl]);
+
+  const fetchProducts = async () => {
+    try {
+      const res = await fetch(`${apiUrl}/api/products?available=true`);
+      if (res.ok) setProducts(await res.json());
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const fetchCategories = async () => {
+    try {
+      const res = await fetch(`${apiUrl}/api/categories`);
+      if (res.ok) setCategories(await res.json());
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   const filteredItems = useMemo(() => {
-    const result = coffeeData.filter((coffee) => {
-      const matchesCategory = selectedCategory === "All" || coffee.category === selectedCategory;
+    const result = products.filter((coffee) => {
+      const catName = coffee.category?.name || "Uncategorized";
+      const matchesCategory = selectedCategory === "All" || catName === selectedCategory;
       const matchesSearch = coffee.name.toLowerCase().includes(search.toLowerCase());
       return matchesCategory && matchesSearch;
     });
 
     return [...result].sort((a, b) => {
-      if (sortBy === "price-low") return a.price - b.price;
-      if (sortBy === "price-high") return b.price - a.price;
+      const priceA = a.discountPrice || a.price;
+      const priceB = b.discountPrice || b.price;
+      
+      if (sortBy === "price-low") return priceA - priceB;
+      if (sortBy === "price-high") return priceB - priceA;
       if (sortBy === "rating") return (b.rating || 0) - (a.rating || 0);
       return (b.reviewCount || 0) - (a.reviewCount || 0);
     });
-  }, [search, selectedCategory, sortBy]);
+  }, [search, selectedCategory, sortBy, products]);
+
+  const catNames = ["All", ...categories.map(c => c.name)];
 
   return (
-    <div className="bg-[#fffaf6] text-[#2a1d17]">
+    <div className="bg-[#fffaf6] text-[#2a1d17] min-h-screen">
       <section className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
         <div className="mb-10 text-center">
           <p className="text-sm font-semibold uppercase tracking-[0.22em] text-[#8a6a5e]">Our menu</p>
@@ -35,7 +76,7 @@ export default function Menu() {
 
         <div className="mb-8 rounded-[28px] border border-[#f0e7df] bg-white p-4 shadow-[0_18px_38px_rgba(95,75,61,0.04)] md:p-6">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-            <div className="flex max-w-xl items-center gap-3 rounded-full border border-[#e6d6c8] bg-[#fffaf6] px-4 py-3">
+            <div className="flex max-w-xl items-center gap-3 rounded-full border border-[#e6d6c8] bg-[#fffaf6] px-4 py-3 w-full lg:w-[400px]">
               <FiSearch className="text-[#7a6155]" />
               <input
                 aria-label="Search menu"
@@ -63,7 +104,7 @@ export default function Menu() {
           </div>
 
           <div className="mt-6 flex flex-wrap gap-3">
-            {categories.map((category) => (
+            {catNames.map((category) => (
               <button
                 key={category}
                 onClick={() => setSelectedCategory(category)}
@@ -88,7 +129,7 @@ export default function Menu() {
 
         <div className="grid gap-7 md:grid-cols-2 xl:grid-cols-3">
           {filteredItems.length > 0 ? (
-            filteredItems.map((coffee) => <CoffeeCard key={coffee.id} coffee={coffee} />)
+            filteredItems.map((coffee) => <CoffeeCard key={coffee._id} coffee={coffee} />)
           ) : (
             <div className="col-span-full rounded-[28px] border border-dashed border-[#d7c3b2] bg-[#fffaf6] p-10 text-center text-[#5f4a42]">
               No drinks match your search. Try another keyword or category.

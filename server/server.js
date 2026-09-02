@@ -9,6 +9,10 @@ import { MongoMemoryServer } from 'mongodb-memory-server';
 import Order from './models/Order.js';
 import productRoutes from './routes/productRoutes.js';
 import categoryRoutes from './routes/categoryRoutes.js';
+import offerRoutes from './routes/offerRoutes.js';
+import settingRoutes from './routes/settingRoutes.js';
+import sectionRoutes from './routes/sectionRoutes.js';
+import adminDataRoutes from './routes/adminRoutes.js';
 
 dotenv.config();
 
@@ -33,7 +37,10 @@ app.use('/uploads', express.static(path.join(process.cwd(), 'public', 'uploads')
 // Register API routes
 app.use('/api/products', productRoutes);
 app.use('/api/categories', categoryRoutes);
-
+app.use('/api/offers', offerRoutes);
+app.use('/api/settings', settingRoutes);
+app.use('/api/sections', sectionRoutes);
+app.use('/api/admin', adminDataRoutes);
 
 
 
@@ -50,22 +57,23 @@ app.post('/api/admin/verify', (req, res) => {
 const connectDB = async () => {
   try {
     let mongoUri = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/coffeehub';
-    
+
     // Check if we need to use memory server (e.g., if local Mongo is not running)
     if (mongoUri.includes('127.0.0.1') || mongoUri.includes('localhost')) {
       try {
         await mongoose.connect(mongoUri, { serverSelectionTimeoutMS: 2000 });
-        console.log('MongoDB connected to local instance');
+        console.log('MongoDB connected to local instance at', mongoUri);
         return;
       } catch (err) {
         console.log('Local MongoDB not found, starting memory server for testing...');
         const mongod = await MongoMemoryServer.create();
         mongoUri = mongod.getUri();
+        console.log('MongoDB memory server URI:', mongoUri);
       }
     }
-    
+
     await mongoose.connect(mongoUri);
-    console.log('MongoDB connected (Memory Server or Atlas)');
+    console.log('MongoDB connected (Memory Server or Atlas) using', mongoUri);
   } catch (err) {
     console.error('MongoDB connection error:', err);
   }

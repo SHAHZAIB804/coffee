@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { Outlet, useNavigate, Link, useLocation } from 'react-router-dom';
-import { FiHome, FiShoppingBag, FiBox, FiGrid, FiLayout, FiTag, FiSettings, FiLogOut } from 'react-icons/fi';
+import { FiHome, FiShoppingBag, FiBox, FiGrid, FiLayout, FiTag, FiSettings, FiLogOut, FiUsers } from 'react-icons/fi';
 
 const AdminLayout = () => {
   const navigate = useNavigate();
@@ -24,8 +24,9 @@ const AdminLayout = () => {
     { name: 'Products', path: '/admin/products', icon: FiBox },
     { name: 'Categories', path: '/admin/categories', icon: FiGrid },
     { name: 'Sections', path: '/admin/sections', icon: FiLayout },
+    { name: 'Homepage', path: '/admin/homepage', icon: FiLayout },
     { name: 'Offers', path: '/admin/offers', icon: FiTag },
-    { name: 'Settings', path: '/admin/settings', icon: FiSettings },
+    { name: 'Customers', path: '/admin/customers', icon: FiUsers },
   ];
 
   return (

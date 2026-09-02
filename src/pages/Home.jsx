@@ -1,16 +1,10 @@
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { FiArrowRight, FiCoffee, FiTruck, FiStar, FiGift } from "react-icons/fi";
+import { io } from "socket.io-client";
 import Hero from "../components/Hero";
 import CoffeeCard from "../components/CoffeeCard";
-import coffeeData from "../data/coffeeData";
-
-const categories = [
-  { name: "Espresso", desc: "Bold and concentrated" },
-  { name: "Cold Brew", desc: "Smooth and refreshing" },
-  { name: "Signature", desc: "Chef-crafted icons" },
-  { name: "Seasonal", desc: "Fresh limited drops" },
-];
 
 const reasons = [
   {
@@ -42,11 +36,73 @@ const reviews = [
 ];
 
 export default function Home() {
-  const bestSellers = coffeeData.slice(0, 4);
+  const [heroData, setHeroData] = useState({});
+  const [promoData, setPromoData] = useState({ isActive: false });
+  const [products, setProducts] = useState([]);
+  const [sections, setSections] = useState([]);
+  const [categories, setCategories] = useState([]);
+
+  const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
+  useEffect(() => {
+    fetchData();
+
+    const socket = io(apiUrl);
+    socket.on('setting:updated', () => fetchSettings());
+    socket.on('section:updated', () => fetchSections());
+    socket.on('product:updated', () => fetchProducts());
+    socket.on('product:created', () => fetchProducts());
+    socket.on('product:deleted', () => fetchProducts());
+    socket.on('category:updated', () => fetchCategories());
+
+    return () => socket.disconnect();
+  }, [apiUrl]);
+
+  const fetchData = async () => {
+    fetchSettings();
+    fetchSections();
+    fetchProducts();
+    fetchCategories();
+  };
+
+  const fetchSettings = async () => {
+    try {
+      const res = await fetch(`${apiUrl}/api/settings`);
+      if (res.ok) {
+        const data = await res.json();
+        if (data.hero) setHeroData(data.hero);
+        if (data.promo) setPromoData(data.promo);
+      }
+    } catch (e) {}
+  };
+
+  const fetchSections = async () => {
+    try {
+      const res = await fetch(`${apiUrl}/api/sections`);
+      if (res.ok) setSections(await res.json());
+    } catch (e) {}
+  };
+
+  const fetchProducts = async () => {
+    try {
+      const res = await fetch(`${apiUrl}/api/products?available=true`);
+      if (res.ok) setProducts(await res.json());
+    } catch (e) {}
+  };
+
+  const fetchCategories = async () => {
+    try {
+      const res = await fetch(`${apiUrl}/api/categories`);
+      if (res.ok) setCategories(await res.json());
+    } catch (e) {}
+  };
+
+  const bestSellers = products.filter(p => p.isFeatured).slice(0, 4);
+  if (bestSellers.length === 0) bestSellers.push(...products.slice(0, 4));
 
   return (
     <div className="bg-[#f9f4ee] text-[#2a1d17]">
-      <Hero />
+      <Hero data={heroData} />
 
       <section className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
         <div className="mb-12 text-center">
@@ -57,7 +113,7 @@ export default function Home() {
         <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
           {categories.map((item, index) => (
             <motion.div
-              key={item.name}
+              key={item._id}
               initial={{ opacity: 0, y: 24 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
@@ -68,7 +124,6 @@ export default function Home() {
                 ☕
               </div>
               <h3 className="text-xl font-semibold text-[#2a1d17]">{item.name}</h3>
-              <p className="mt-2 text-[#7a6155]">{item.desc}</p>
             </motion.div>
           ))}
         </div>
@@ -88,11 +143,32 @@ export default function Home() {
 
           <div className="grid gap-7 md:grid-cols-2 xl:grid-cols-4">
             {bestSellers.map((coffee) => (
-              <CoffeeCard key={coffee.id} coffee={coffee} />
+              <CoffeeCard key={coffee._id} coffee={coffee} />
             ))}
           </div>
         </div>
       </section>
+
+      {/* Render Dynamic Sections */}
+      {sections.map(section => (
+        <section key={section._id} className="py-20 bg-[#fffaf6]">
+           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+              <div className="mb-12 flex flex-col justify-between gap-4 md:flex-row md:items-end">
+                <div>
+                  <h2 className="mt-3 text-4xl font-black text-[#2a1d17]">{section.title}</h2>
+                  {section.content?.description && (
+                     <p className="mt-2 text-[#7a6155] max-w-2xl">{section.content.description}</p>
+                  )}
+                </div>
+              </div>
+              <div className="grid gap-7 md:grid-cols-2 xl:grid-cols-4">
+                {products.filter(p => section.content?.productIds?.includes(p._id)).map((coffee) => (
+                  <CoffeeCard key={coffee._id} coffee={coffee} />
+                ))}
+              </div>
+           </div>
+        </section>
+      ))}
 
       <section className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
         <div className="grid gap-8 lg:grid-cols-[1.2fr_0.8fr]">
@@ -112,31 +188,38 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="overflow-hidden rounded-[32px] bg-[#f7efe8] p-6 shadow-[0_20px_40px_rgba(81,57,46,0.08)]">
-            <div className="mb-4 inline-flex rounded-full bg-[#e8d7c7] px-3 py-1 text-xs font-bold uppercase tracking-[0.18em] text-[#5c4033]">
-              Limited offer
-            </div>
-            <h3 className="text-3xl font-black text-[#2a1d17]">Roastery Box</h3>
-            <p className="mt-4 text-[#6e534a]">
-              3 premium beans, tasting notes, and brewing guides included in every curated box.
-            </p>
-            <div className="mt-6 rounded-[24px] bg-white p-4 shadow-sm">
-              <div className="flex items-center justify-between">
-                <div>
-                  <div className="text-sm uppercase tracking-[0.18em] text-[#8a6a5e]">From</div>
-                  <div className="text-3xl font-black text-[#2a1d17]">$29</div>
+          {promoData.isActive ? (
+            <div className="overflow-hidden rounded-[32px] bg-[#f7efe8] p-6 shadow-[0_20px_40px_rgba(81,57,46,0.08)] relative">
+              {promoData.imageUrl && (
+                 <img src={`${apiUrl}${promoData.imageUrl}`} alt="Promo background" className="absolute inset-0 w-full h-full object-cover opacity-30" />
+              )}
+              <div className="relative z-10">
+                <div className="mb-4 inline-flex rounded-full bg-[#e8d7c7] px-3 py-1 text-xs font-bold uppercase tracking-[0.18em] text-[#5c4033]">
+                  Special Offer
                 </div>
-                <img
-                  src="https://images.unsplash.com/photo-1442512595331-e89e73853f31?auto=format&fit=crop&w=600&q=80"
-                  alt="Coffee subscription box"
-                  className="h-24 w-24 rounded-2xl object-cover"
-                />
+                <h3 className="text-3xl font-black text-[#2a1d17]">{promoData.heading || 'Promo'}</h3>
+                <p className="mt-4 text-[#6e534a]">
+                  {promoData.description}
+                </p>
+                <div className="mt-6 rounded-[24px] bg-white p-4 shadow-sm">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <div className="text-sm uppercase tracking-[0.18em] text-[#8a6a5e]">Discount</div>
+                      <div className="text-3xl font-black text-[#2a1d17]">{promoData.discount}</div>
+                    </div>
+                  </div>
+                </div>
+                <Link to="/menu" className="mt-6 inline-flex items-center gap-2 rounded-full bg-[#5c4033] px-5 py-3 font-semibold text-white transition hover:bg-[#442d25]">
+                  {promoData.buttonText || 'Shop Now'} <FiArrowRight />
+                </Link>
               </div>
             </div>
-            <Link to="/shop" className="mt-6 inline-flex items-center gap-2 rounded-full bg-[#5c4033] px-5 py-3 font-semibold text-white transition hover:bg-[#442d25]">
-              Shop subscription <FiArrowRight />
-            </Link>
-          </div>
+          ) : (
+             <div className="overflow-hidden rounded-[32px] bg-[#f7efe8] p-6 shadow-[0_20px_40px_rgba(81,57,46,0.08)]">
+                <h3 className="text-3xl font-black text-[#2a1d17] mt-10">Join our newsletter</h3>
+                <p className="mt-4 text-[#6e534a]">Get exclusive updates and offers.</p>
+             </div>
+          )}
         </div>
       </section>
 
@@ -159,27 +242,6 @@ export default function Home() {
                 <div className="mt-6 font-semibold text-[#2a1d17]">{review.name}</div>
               </div>
             ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
-        <div className="rounded-[32px] bg-gradient-to-r from-[#2a1d17] to-[#4b342c] p-8 text-white shadow-[0_30px_90px_rgba(74,53,41,0.28)] sm:p-12">
-          <div className="flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between">
-            <div>
-              <p className="text-sm font-semibold uppercase tracking-[0.22em] text-[#d9a668]">Stay in the loop</p>
-              <h2 className="mt-4 text-4xl font-black">Fresh roasts. Better mornings.</h2>
-            </div>
-            <div className="flex w-full max-w-xl flex-col gap-3 sm:flex-row">
-              <input
-                type="email"
-                placeholder="Email address"
-                className="w-full rounded-full border border-white/15 bg-white/5 px-5 py-3 text-white placeholder:text-white/60 outline-none focus:border-[#d9a668]"
-              />
-              <button className="rounded-full bg-[#d9a668] px-6 py-3 font-semibold text-[#1d120d] transition hover:bg-[#e4b677]">
-                Join now
-              </button>
-            </div>
           </div>
         </div>
       </section>
