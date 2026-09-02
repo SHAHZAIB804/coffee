@@ -1,62 +1,56 @@
-
-
-import { Link } from "react-router-dom"
-import { FaFacebook, FaInstagram, FaTwitter, FaMapMarkerAlt, FaPhone, FaEnvelope, FaLeaf } from "react-icons/fa"
+import { Link } from "react-router-dom";
+import { FaFacebookF, FaInstagram, FaTwitter, FaMapMarkerAlt, FaPhoneAlt, FaEnvelope, FaLeaf } from "react-icons/fa";
 
 export default function Footer() {
+  const socialLinks = [
+    { icon: <FaFacebookF />, href: "#" },
+    { icon: <FaInstagram />, href: "#" },
+    { icon: <FaTwitter />, href: "#" },
+  ];
+
   return (
-    <footer className="bg-gradient-to-br from-coffee-800 to-coffee-900 text-white pt-16 pb-8 px-4">
-      <div className="max-w-7xl mx-auto">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 mb-12">
-          
-          <div className="space-y-5">
-            <Link to="/" className="flex items-center gap-2">
-              <FaLeaf className="text-3xl text-coffee-200" />
-              <span className="text-2xl font-bold text-white">
-                Waffels
+    <footer className="bg-[#1d120d] text-white">
+      <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
+        <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-4">
+          <div>
+            <Link to="/" className="mb-6 flex items-center gap-3 text-2xl font-bold">
+              <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[#f0d7b9] text-[#1d120d]">
+                <FaLeaf />
               </span>
+              <span>Coffee Hub</span>
             </Link>
-            <p className="text-coffee-200 leading-relaxed">
-              Coffee experiences since 2015.
+            <p className="max-w-xs text-[#d8c5b6]">
+              Premium coffee experiences designed for mindful mornings and meaningful gatherings.
             </p>
-            
-            <div className="flex gap-4 pt-2">
-              {[
-                { icon: <FaFacebook className="w-5 h-5" />, url: "#" },
-                { icon: <FaInstagram className="w-5 h-5" />, url: "#" },
-                { icon: <FaTwitter className="w-5 h-5" />, url: "#" }
-              ].map((social, index) => (
-                <a 
+            <div className="mt-6 flex gap-3">
+              {socialLinks.map((item, index) => (
+                <a
                   key={index}
-                  href={social.url} 
-                  className="p-2 bg-coffee-700 hover:bg-coffee-600 rounded-full transition-all hover:scale-110"
+                  href={item.href}
+                  aria-label="Social media"
+                  className="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-white/5 transition hover:border-[#d9a668] hover:text-[#d9a668]"
                 >
-                  {social.icon}
+                  {item.icon}
                 </a>
               ))}
             </div>
           </div>
 
           <div>
-            <h3 className="text-xl font-semibold mb-5 text-white flex items-center gap-2">
-              <span className="w-3 h-3 bg-coffee-300 rounded-full"></span>
-              Explore
-            </h3>
-            <ul className="space-y-3">
+            <h3 className="mb-5 text-lg font-semibold text-white">Explore</h3>
+            <ul className="space-y-3 text-[#d8c5b6]">
               {[
-                { path: "/", name: "Home" },
-                { path: "/menu", name: "Our Menu" },
-                { path: "/shop", name: "Shop" },
-                { path: "/blog", name: "Blog" },
-                { path: "/contact", name: "Contact" }
-              ].map((link) => (
-                <li key={link.name}>
-                  <Link 
-                    to={link.path} 
-                    className="text-coffee-200 hover:text-white transition-colors flex items-center gap-2"
-                  >
-                    <span className="w-2 h-2 bg-coffee-300 rounded-full"></span>
-                    {link.name}
+                ["Home", "/"],
+                ["Menu", "/menu"],
+                ["Shop", "/shop"],
+                ["Blog", "/blog"],
+                ["Contact", "/contact"],
+                ["FAQs", "/faqs"],
+                ["Orders", "/orders"],
+              ].map(([label, path]) => (
+                <li key={label}>
+                  <Link to={path} className="transition hover:text-[#d9a668]">
+                    {label}
                   </Link>
                 </li>
               ))}
@@ -64,69 +58,51 @@ export default function Footer() {
           </div>
 
           <div>
-            <h3 className="text-xl font-semibold mb-5 text-white flex items-center gap-2">
-              <span className="w-3 h-3 bg-coffee-300 rounded-full"></span>
-              Visit Us
-            </h3>
-            <ul className="space-y-4">
+            <h3 className="mb-5 text-lg font-semibold text-white">Visit Us</h3>
+            <ul className="space-y-4 text-[#d8c5b6]">
               <li className="flex items-start gap-3">
-                <div className="p-2 bg-coffee-700 rounded-lg">
-                  <FaMapMarkerAlt className="text-coffee-200" />
-                </div>
-                <div>
-                  <p className="font-medium">Mandi Bahauddin</p>
-                  <p className="text-coffee-200">Pakistan,Mamdi Bahauddin</p>
-                </div>
+                <FaMapMarkerAlt className="mt-1 text-[#d9a668]" />
+                <span>Mandi Bahauddin, Punjab, Pakistan</span>
               </li>
               <li className="flex items-center gap-3">
-                <div className="p-2 bg-coffee-700 rounded-lg">
-                  <FaPhone className="text-coffee-200" />
-                </div>
-                <a href="tel:+923170789020" className="hover:text-white">
-                  +92 317 0789020
-                </a>
+                <FaPhoneAlt className="text-[#d9a668]" />
+                <a href="tel:+923170789020" className="hover:text-[#d9a668]">+92 317 0789020</a>
               </li>
               <li className="flex items-center gap-3">
-                <div className="p-2 bg-coffee-700 rounded-lg">
-                  <FaEnvelope className="text-coffee-200" />
-                </div>
-                <a href="mailto:hello@brewhaven.com" className="hover:text-white">
-                  hello@waffels.com
-                </a>
+                <FaEnvelope className="text-[#d9a668]" />
+                <a href="mailto:hello@coffeehub.com" className="hover:text-[#d9a668]">hello@coffeehub.com</a>
               </li>
             </ul>
           </div>
 
           <div>
-            <h3 className="text-xl font-semibold mb-5 text-white flex items-center gap-2">
-              <span className="w-3 h-3 bg-coffee-300 rounded-full"></span>
-              Newsletter
-            </h3>
-            <p className="text-coffee-200 mb-5">
-              Join our newsletter for special offers.
-            </p>
+            <h3 className="mb-5 text-lg font-semibold text-white">Helpful links</h3>
+            <ul className="space-y-3 text-[#d8c5b6]">
+              <li><Link to="/privacy" className="transition hover:text-[#d9a668]">Privacy policy</Link></li>
+              <li><Link to="/terms" className="transition hover:text-[#d9a668]">Terms & conditions</Link></li>
+            </ul>
+          </div>
+
+          <div>
+            <h3 className="mb-5 text-lg font-semibold text-white">Newsletter</h3>
+            <p className="mb-4 text-[#d8c5b6]">Get first access to seasonal roasts and exclusive offers.</p>
             <form className="space-y-3">
-              <input 
-                type="email" 
-                placeholder="Your email" 
-                className="w-full px-4 py-3 rounded-lg bg-coffee-700 border border-coffee-600 text-white placeholder-coffee-300 focus:outline-none focus:ring-2 focus:ring-coffee-400"
+              <input
+                type="email"
+                placeholder="Your email"
+                className="w-full rounded-full border border-white/10 bg-white/5 px-4 py-3 text-white placeholder:text-[#d8c5b6] outline-none ring-0 transition focus:border-[#d9a668]"
               />
-              <button 
-                type="submit" 
-                className="w-full bg-coffee-600 hover:bg-coffee-700 text-white py-3 px-6 rounded-lg transition-colors"
-              >
+              <button type="submit" className="w-full rounded-full bg-[#d9a668] px-4 py-3 font-semibold text-[#1d120d] transition hover:bg-[#e4b677]">
                 Subscribe
               </button>
             </form>
           </div>
         </div>
 
-        <div className="pt-8 border-t border-coffee-700 text-center">
-          <p className="text-coffee-300">
-            © {new Date().getFullYear()} Waffels. All rights reserved.
-          </p>
+        <div className="mt-12 border-t border-white/10 pt-6 text-center text-sm text-[#d8c5b6]">
+          © {new Date().getFullYear()} Coffee Hub. All rights reserved.
         </div>
       </div>
     </footer>
-  )
+  );
 }

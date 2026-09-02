@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Coffee Hub logo">
+  <rect width="64" height="64" rx="18" fill="#1d120d"/>
+  <path d="M15 28c0-7.2 5.8-13 13-13h8c7.2 0 13 5.8 13 13v7c0 10.5-8.5 19-19 19h-4c-10.5 0-19-8.5-19-19v-7zm13-9c-5.5 0-10 4.5-10 10v7c0 7.7 6.3 14 14 14h4c7.7 0 14-6.3 14-14v-7c0-5.5-4.5-10-10-10h-12zm1 8h10v5H29v-5zm-4 11h18v4H25v-4z" fill="#d9a668"/>
+  <path d="M47 25h5c1.7 0 3 1.3 3 3s-1.3 3-3 3h-5v-6z" fill="#f0d7b9"/>
+</svg>
