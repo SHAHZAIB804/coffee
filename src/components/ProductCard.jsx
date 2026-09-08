@@ -3,7 +3,7 @@ import { useCart } from "../context/CartContext.jsx";
 import { FiShoppingCart } from "react-icons/fi";
 
 export default function ProductCard({ product }) {
-  const { add } = useCart();
+  const { addToCart } = useCart();
 
   return (
     <motion.div
@@ -61,8 +61,7 @@ export default function ProductCard({ product }) {
         {/* Add to Cart Button */}
         <motion.button
           onClick={() => {
-            add(product, 1);
-            // You could add a toast notification here
+            addToCart(product, 1);
           }}
           className="w-full flex items-center justify-center gap-2 bg-coffee-600 hover:bg-coffee-700 text-white py-2.5 px-4 rounded-lg font-medium transition-colors duration-200"
           whileTap={{ scale: 0.95 }}
